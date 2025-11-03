@@ -1,0 +1,226 @@
+<!-- Agent Management Tab Content -->
+<div id="agents-content" class="tab-content hidden">
+    <!-- Agent Statistics Section -->
+    <section class="agents-section">
+        <div class="section-header">
+            <h2><i class="fas fa-robot"></i> Agent Overview</h2>
+        </div>
+
+        <div class="agent-stats-grid">
+            <div class="agent-stat-card">
+                <div class="stat-header">
+                    <i class="fas fa-robot"></i>
+                    <h3>Total Agents</h3>
+                </div>
+                <div class="stat-value" id="stat-total-agents">0</div>
+                <div class="stat-breakdown">
+                    <small><span id="stat-agents-online">0</span> Online</small>
+                    <small><span id="stat-agents-offline">0</span> Offline</small>
+                </div>
+            </div>
+
+            <div class="agent-stat-card">
+                <div class="stat-header">
+                    <i class="fas fa-search"></i>
+                    <h3>Velociraptor</h3>
+                </div>
+                <div class="stat-value" id="stat-velo-agents">--</div>
+                <div class="stat-breakdown">
+                    <small>Endpoints: <span id="stat-velo-status">Unknown</span></small>
+                </div>
+            </div>
+
+            <div class="agent-stat-card">
+                <div class="stat-header">
+                    <i class="fas fa-shield-alt"></i>
+                    <h3>Wazuh</h3>
+                </div>
+                <div class="stat-value" id="stat-wazuh-agents">--</div>
+                <div class="stat-breakdown">
+                    <small>Manager: <span id="stat-wazuh-status">Unknown</span></small>
+                </div>
+            </div>
+
+            <div class="agent-stat-card">
+                <div class="stat-header">
+                    <i class="fas fa-server"></i>
+                    <h3>Platform Distribution</h3>
+                </div>
+                <div class="platform-dist">
+                    <small>Windows: <span id="stat-platform-windows">0</span></small>
+                    <small>Linux: <span id="stat-platform-linux">0</span></small>
+                    <small>macOS: <span id="stat-platform-macos">0</span></small>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Quick Deployment Section -->
+    <section class="agents-section">
+        <div class="section-header">
+            <h2><i class="fas fa-rocket"></i> Quick Deployment</h2>
+        </div>
+
+        <div class="deployment-container">
+            <div class="deployment-step">
+                <h3>1. Select Agent</h3>
+                <select id="agent-type-select" class="form-control">
+                    <option value="">Choose Agent...</option>
+                    <option value="velociraptor">Velociraptor (Endpoint Detection)</option>
+                    <option value="wazuh">Wazuh (Log Collection)</option>
+                </select>
+            </div>
+
+            <div class="deployment-step">
+                <h3>2. Select Platform</h3>
+                <select id="platform-select" class="form-control" disabled>
+                    <option value="">Choose Platform...</option>
+                    <option value="windows">Windows (x86_64)</option>
+                    <option value="windows-x86">Windows (x86)</option>
+                    <option value="linux-deb">Linux (DEB/Ubuntu)</option>
+                    <option value="linux-rpm">Linux (RPM/CentOS)</option>
+                    <option value="macos">macOS (Intel/Apple Silicon)</option>
+                </select>
+            </div>
+
+            <div class="deployment-actions">
+                <button class="btn btn-primary" id="download-installer-btn" disabled>
+                    <i class="fas fa-download"></i> Download Installer
+                </button>
+                <button class="btn btn-info" id="copy-oneliner-btn" disabled>
+                    <i class="fas fa-copy"></i> Copy One-Liner
+                </button>
+                <button class="btn btn-secondary" id="show-instructions-btn" disabled>
+                    <i class="fas fa-book"></i> Instructions
+                </button>
+            </div>
+
+            <div id="oneliner-display" class="oneliner-display" style="display: none;">
+                <p>Copy and paste this command:</p>
+                <code id="oneliner-code"></code>
+            </div>
+        </div>
+    </section>
+
+    <!-- Agents List Section -->
+    <section class="agents-section">
+        <div class="section-header">
+            <h2><i class="fas fa-list"></i> Connected Agents</h2>
+            <div class="section-controls">
+                <input 
+                    type="text" 
+                    id="agents-search" 
+                    class="search-input" 
+                    placeholder="Search agents..."
+                >
+                <button class="btn btn-sm" id="refresh-agents-btn">
+                    <i class="fas fa-sync-alt"></i> Refresh
+                </button>
+            </div>
+        </div>
+
+        <div class="agents-filter">
+            <button class="filter-btn active" data-filter="all">All</button>
+            <button class="filter-btn" data-filter="velociraptor">Velociraptor</button>
+            <button class="filter-btn" data-filter="wazuh">Wazuh</button>
+            <button class="filter-btn" data-filter="online">Online</button>
+            <button class="filter-btn" data-filter="offline">Offline</button>
+        </div>
+
+        <div class="agents-table-container">
+            <table class="agents-table">
+                <thead>
+                    <tr>
+                        <th>Agent Name</th>
+                        <th>Type</th>
+                        <th>Platform</th>
+                        <th>Status</th>
+                        <th>Last Seen</th>
+                        <th>IP Address</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="agents-table-body">
+                    <tr>
+                        <td colspan="7" class="text-center">
+                            <i class="fas fa-spin fa-spinner"></i> Loading agents...
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- Deployment Methods Section -->
+    <section class="agents-section">
+        <div class="section-header">
+            <h2><i class="fas fa-cogs"></i> Deployment Methods</h2>
+        </div>
+
+        <div class="deployment-methods-grid">
+            <div class="deployment-method-card">
+                <h3><i class="fas fa-globe"></i> Web Download</h3>
+                <p>Download installer from web portal and run manually on endpoints</p>
+                <button class="btn btn-sm btn-primary" onclick="agentManager.showMethod('web-download')">
+                    Use This Method
+                </button>
+            </div>
+
+            <div class="deployment-method-card">
+                <h3><i class="fas fa-terminal"></i> PowerShell</h3>
+                <p>One-line PowerShell command for Windows deployment</p>
+                <button class="btn btn-sm btn-primary" onclick="agentManager.showMethod('powershell')">
+                    Use This Method
+                </button>
+            </div>
+
+            <div class="deployment-method-card">
+                <h3><i class="fas fa-linux"></i> Bash</h3>
+                <p>One-line Bash script for Linux/macOS deployment</p>
+                <button class="btn btn-sm btn-primary" onclick="agentManager.showMethod('bash')">
+                    Use This Method
+                </button>
+            </div>
+
+            <div class="deployment-method-card">
+                <h3><i class="fas fa-docker"></i> Docker</h3>
+                <p>Deploy agent as containerized service for testing</p>
+                <button class="btn btn-sm btn-primary" onclick="agentManager.showMethod('docker')">
+                    Use This Method
+                </button>
+            </div>
+
+            <div class="deployment-method-card">
+                <h3><i class="fas fa-cube"></i> Ansible</h3>
+                <p>Ansible playbook for automated Linux deployment</p>
+                <button class="btn btn-sm btn-primary" onclick="agentManager.showMethod('ansible')">
+                    Use This Method
+                </button>
+            </div>
+
+            <div class="deployment-method-card">
+                <h3><i class="fas fa-key"></i> Group Policy</h3>
+                <p>Deploy Windows agents via Active Directory GPO</p>
+                <button class="btn btn-sm btn-primary" onclick="agentManager.showMethod('gpo')">
+                    Use This Method
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Agent Logs Modal -->
+    <div id="agent-logs-modal" class="modal hidden">
+        <div class="modal-content modal-lg">
+            <div class="modal-header">
+                <h2>Agent Logs: <span id="modal-agent-name"></span></h2>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body" id="agent-logs-body">
+                <!-- Agent logs populated here -->
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="close-logs-modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>

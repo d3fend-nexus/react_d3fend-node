@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  velociraptor:
+    image: velocidex/velociraptor:latest
+    container_name: velociraptor-server
+    ports:
+      - "8889:8889"      # Frontend UI
+      - "8888:8888"      # Client communication
+    environment:
+      - VELOCIRAPTOR_SERVER_URL=https://${SERVER_IP:-localhost}:8889
+      - VELOCIRAPTOR_DATASTORE=/data
+    volumes:
+      - velociraptor-data:/data
+      - ./server.config.yaml:/etc/velociraptor/server.config.yaml:ro
+    networks:
+      - btpi-core-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "-k", "https://localhost:8889"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    command: >
+      bash -c "
+      if [ ! -f /data/server.config.yaml ]; then
+        velociraptor config generate -i > /data/server.config.yaml;
+      fi;
+      velociraptor frontend -c /data/server.config.yaml
+      "
+
+volumes:
+  velociraptor-data:
+    driver: local
+
+networks:
+  btpi-core-network:
+    driver: bridge

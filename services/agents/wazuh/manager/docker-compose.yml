@@ -1,0 +1,104 @@
+version: '3.8'
+
+services:
+  wazuh-indexer:
+    image: docker.io/wazuh/wazuh-indexer:4.6.0
+    container_name: wazuh-indexer
+    environment:
+      - node.name=wazuh-indexer
+      - cluster.name=wazuh-cluster
+      - cluster.initial_master_nodes=wazuh-indexer
+      - discovery.seed_hosts=wazuh-indexer
+      - xpack.security.enabled=true
+      - xpack.security.transport.ssl.enabled=true
+      - xpack.security.transport.ssl.certificate=/etc/certs/node-cert.pem
+      - xpack.security.transport.ssl.key=/etc/certs/node-key.pem
+      - xpack.security.http.ssl.enabled=true
+      - xpack.security.http.ssl.certificate=/etc/certs/node-cert.pem
+      - xpack.security.http.ssl.key=/etc/certs/node-key.pem
+    volumes:
+      - wazuh-indexer-data:/var/lib/opensearch
+      - ./certs:/etc/certs:ro
+    networks:
+      - btpi-core-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "-k", "https://localhost:9200"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  wazuh-manager:
+    image: docker.io/wazuh/wazuh:4.6.0
+    container_name: wazuh-manager
+    environment:
+      - INDEXER_URL=https://wazuh-indexer:9200
+      - INDEXER_USERNAME=admin
+      - INDEXER_PASSWORD=${WAZUH_INDEXER_PASSWORD:-SecurePassword123}
+      - FILEBEAT_SSL_VERIFICATION_MODE=full
+      - SSL_CERTIFICATE_AUTHORITIES=/etc/certs/ca-cert.pem
+      - SSL_CERTIFICATE=/etc/certs/server-cert.pem
+      - SSL_KEY=/etc/certs/server-key.pem
+      - WAZUH_API_USER=wazuh
+      - WAZUH_API_PASSWORD=${WAZUH_API_PASSWORD:-SecurePassword123}
+    ports:
+      - "1514:1514"      # Agent communication
+      - "1515:1515"      # Agent communication (TCP)
+      - "514:514/udp"    # Syslog
+      - "55000:55000"    # API
+    volumes:
+      - wazuh-api-data:/var/ossec/api/configuration
+      - wazuh-etc-data:/var/ossec/etc
+      - wazuh-logs-data:/var/ossec/logs
+      - ./certs:/etc/certs:ro
+    networks:
+      - btpi-core-network
+    restart: unless-stopped
+    depends_on:
+      - wazuh-indexer
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:55000"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  wazuh-dashboard:
+    image: docker.io/wazuh/wazuh-dashboard:4.6.0
+    container_name: wazuh-dashboard
+    environment:
+      - INDEXER_USERNAME=admin
+      - INDEXER_PASSWORD=${WAZUH_INDEXER_PASSWORD:-SecurePassword123}
+      - WAZUH_API_URL=https://wazuh-manager
+      - WAZUH_API_USERNAME=wazuh
+      - WAZUH_API_PASSWORD=${WAZUH_API_PASSWORD:-SecurePassword123}
+      - DASHBOARD_USERNAME=kibanaserver
+      - DASHBOARD_PASSWORD=${WAZUH_DASHBOARD_PASSWORD:-SecurePassword123}
+    ports:
+      - "443:5601"       # Dashboard UI
+    volumes:
+      - wazuh-dashboard-data:/usr/share/wazuh-dashboard/data
+      - ./certs/dashboard.crt:/usr/share/wazuh-dashboard/certs/node-cert.pem:ro
+      - ./certs/dashboard.key:/usr/share/wazuh-dashboard/certs/node-key.pem:ro
+      - ./certs/ca.crt:/usr/share/wazuh-dashboard/certs/ca-cert.pem:ro
+    networks:
+      - btpi-core-network
+    restart: unless-stopped
+    depends_on:
+      - wazuh-indexer
+      - wazuh-manager
+
+volumes:
+  wazuh-indexer-data:
+    driver: local
+  wazuh-api-data:
+    driver: local
+  wazuh-etc-data:
+    driver: local
+  wazuh-logs-data:
+    driver: local
+  wazuh-dashboard-data:
+    driver: local
+
+networks:
+  btpi-core-network:
+    driver: bridge

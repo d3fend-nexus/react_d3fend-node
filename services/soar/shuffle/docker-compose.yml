@@ -1,0 +1,90 @@
+version: '3.8'
+
+services:
+  shuffle-backend:
+    image: ghcr.io/frikky/shuffle-backend:latest
+    container_name: shuffle-backend
+    environment:
+      - ENVIRONMENT_NAME=production
+      - ORG_ID=shuffle
+    ports:
+      - "5002:5001"
+    volumes:
+      - shuffle-files:/shuffle_files
+      - shuffle-db:/database
+    networks:
+      - soar-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5001/api/v1/orgs"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+
+  shuffle-frontend:
+    image: ghcr.io/frikky/shuffle-frontend:latest
+    container_name: shuffle-frontend
+    ports:
+      - "3003:80"
+    environment:
+      - REACT_APP_BACKEND_URL=http://localhost:5002
+    depends_on:
+      - shuffle-backend
+    networks:
+      - soar-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3001"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+
+  shuffle-orborus:
+    image: ghcr.io/frikky/shuffle-orborus:latest
+    container_name: shuffle-orborus
+    environment:
+      - BACKEND_URL=http://shuffle-backend:5001
+      - ENVIRONMENT_NAME=production
+      - ORG_ID=shuffle
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - shuffle-orborus:/etc/orborus
+    networks:
+      - soar-network
+    depends_on:
+      - shuffle-backend
+    restart: unless-stopped
+
+  shuffle-webhook:
+    image: ghcr.io/frikky/shuffle-backend:latest
+    container_name: shuffle-webhook
+    environment:
+      - ENVIRONMENT_NAME=production
+      - ORG_ID=shuffle
+    ports:
+      - "3004:8080"
+    volumes:
+      - shuffle-files:/shuffle_files
+    networks:
+      - soar-network
+    depends_on:
+      - shuffle-backend
+    command: python3 -u /app/webhook_server.py
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/healthz"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+
+volumes:
+  shuffle-files:
+    driver: local
+  shuffle-db:
+    driver: local
+  shuffle-orborus:
+    driver: local
+
+networks:
+  soar-network:
+    driver: bridge

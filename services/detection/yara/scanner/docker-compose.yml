@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  yara-scanner:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: yara-scanner
+    ports:
+      - "8001:8001"
+    environment:
+      - YARA_DB_PATH=/data/yara
+      - FLASK_ENV=production
+      - FLASK_PORT=8001
+    volumes:
+      - yara-rules:/data/yara/rules
+      - yara-samples:/data/yara/samples
+      - yara-cache:/data/yara/cache
+    networks:
+      - btpi-core-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8001/api/yara/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+volumes:
+  yara-rules:
+    driver: local
+  yara-samples:
+    driver: local
+  yara-cache:
+    driver: local
+
+networks:
+  btpi-core-network:
+    driver: bridge

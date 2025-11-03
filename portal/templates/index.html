@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BTPI-REACT Portal - SOC Dashboard</title>
+    <link rel="stylesheet" href="/static/css/main.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <i class="fas fa-shield-alt"></i>
+                <h1>BTPI-REACT Portal</h1>
+            </div>
+            <div class="nav-stats">
+                <div class="stat-item">
+                    <i class="fas fa-cubes"></i>
+                    <span id="nav-container-count">Loading...</span> containers
+                </div>
+                <div class="stat-item">
+                    <i class="fas fa-check-circle"></i>
+                    <span id="nav-health-percent">Loading...</span>% healthy
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container">
+        <!-- System Metrics Section -->
+        <section class="metrics-section">
+            <h2><i class="fas fa-chart-line"></i> System Metrics</h2>
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <i class="fas fa-microchip"></i>
+                        <h3>CPU Usage</h3>
+                    </div>
+                    <div class="metric-body">
+                        <div class="metric-value" id="cpu-value">--</div>
+                        <div class="metric-bar">
+                            <div class="metric-fill" id="cpu-bar" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <i class="fas fa-memory"></i>
+                        <h3>Memory</h3>
+                    </div>
+                    <div class="metric-body">
+                        <div class="metric-value" id="memory-value">--</div>
+                        <div class="metric-bar">
+                            <div class="metric-fill" id="memory-bar" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <i class="fas fa-hdd"></i>
+                        <h3>Disk</h3>
+                    </div>
+                    <div class="metric-body">
+                        <div class="metric-value" id="disk-value">--</div>
+                        <div class="metric-bar">
+                            <div class="metric-fill" id="disk-bar" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <i class="fas fa-cubes"></i>
+                        <h3>Containers</h3>
+                    </div>
+                    <div class="metric-body">
+                        <div class="metric-value">
+                            <span id="running-count">--</span>/<span id="total-count">--</span>
+                        </div>
+                        <div class="metric-text">
+                            <small><span id="stopped-count">--</span> stopped</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tools Section -->
+        <section class="tools-section">
+            <div class="section-header">
+                <h2><i class="fas fa-cog"></i> Security Tools</h2>
+                <div class="section-controls">
+                    <button class="btn btn-sm" id="refresh-btn">
+                        <i class="fas fa-sync-alt"></i> Refresh
+                    </button>
+                </div>
+            </div>
+
+            <div class="tools-filter">
+                <button class="filter-btn active" data-filter="all">All Tools</button>
+                <button class="filter-btn" data-filter="dfir">DFIR</button>
+                <button class="filter-btn" data-filter="siem">SIEM</button>
+                <button class="filter-btn" data-filter="data">Data</button>
+                <button class="filter-btn" data-filter="management">Management</button>
+                <button class="filter-btn" data-filter="utility">Utility</button>
+            </div>
+
+            <div id="tools-grid" class="tools-grid">
+                <!-- Populated by JavaScript -->
+            </div>
+        </section>
+
+        <!-- Activity Log Section -->
+        <section class="activity-section">
+            <div class="section-header">
+                <h2><i class="fas fa-history"></i> Recent Activity</h2>
+                <div class="section-controls">
+                    <button class="btn btn-sm" id="clear-log-btn">
+                        <i class="fas fa-trash"></i> Clear
+                    </button>
+                </div>
+            </div>
+            <div id="activity-log" class="activity-log">
+                <!-- Populated by JavaScript -->
+            </div>
+        </section>
+    </main>
+
+    <!-- Modal for Tool Details -->
+    <div id="tool-modal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modal-tool-name">Tool Details</h2>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body" id="modal-body">
+                <!-- Populated dynamically -->
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="modal-close-btn">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Indicator -->
+    <div id="loading-overlay" class="loading-overlay hidden">
+        <div class="spinner"></div>
+        <p>Loading...</p>
+    </div>
+
+    <!-- Scripts -->
+    <script src="/static/js/api-client.js"></script>
+    <script src="/static/js/dashboard.js"></script>
+</body>
+</html>

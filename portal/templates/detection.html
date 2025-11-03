@@ -1,0 +1,346 @@
+<!-- Detection Management Tab Content -->
+<div id="detection-content" class="tab-content hidden">
+    <!-- Detection Statistics Section -->
+    <section class="detection-section">
+        <div class="section-header">
+            <h2><i class="fas fa-shield-alt"></i> Detection Overview</h2>
+        </div>
+
+        <div class="detection-stats-grid">
+            <div class="detection-stat-card">
+                <div class="stat-header">
+                    <i class="fas fa-file-contract"></i>
+                    <h3>YARA Rules</h3>
+                </div>
+                <div class="stat-value" id="stat-yara-total">0</div>
+                <div class="stat-breakdown">
+                    <small>Active: <span id="stat-yara-active">0</span></small>
+                    <small>Auto-Gen: <span id="stat-yara-autogen">0</span></small>
+                </div>
+            </div>
+
+            <div class="detection-stat-card">
+                <div class="stat-header">
+                    <i class="fas fa-shield-virus"></i>
+                    <h3>Sigma Rules</h3>
+                </div>
+                <div class="stat-value" id="stat-sigma-total">0</div>
+                <div class="stat-breakdown">
+                    <small>Windows: <span id="stat-sigma-windows">0</span></small>
+                    <small>Linux: <span id="stat-sigma-linux">0</span></small>
+                </div>
+            </div>
+
+            <div class="detection-stat-card">
+                <div class="stat-header">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <h3>Detection Hits</h3>
+                </div>
+                <div class="stat-value" id="stat-detection-hits">0</div>
+                <div class="stat-breakdown">
+                    <small>Last 24h: <span id="stat-hits-24h">0</span></small>
+                </div>
+            </div>
+
+            <div class="detection-stat-card">
+                <div class="stat-header">
+                    <i class="fas fa-exchange-alt"></i>
+                    <h3>Auto-Conversion</h3>
+                </div>
+                <div class="stat-value" id="stat-misp-rules">0</div>
+                <div class="stat-breakdown">
+                    <small>From MISP: <span id="stat-misp-converted">0</span></small>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Quick IOC Conversion Section -->
+    <section class="detection-section">
+        <div class="section-header">
+            <h2><i class="fas fa-magic"></i> Quick IOC Conversion</h2>
+        </section>
+
+        <div class="ioc-converter-container">
+            <div class="converter-input">
+                <h3>1. Select IOC Type</h3>
+                <select id="ioc-type-select" class="form-control">
+                    <option value="">Choose Type...</option>
+                    <option value="md5">File Hash (MD5)</option>
+                    <option value="sha1">File Hash (SHA1)</option>
+                    <option value="sha256">File Hash (SHA256)</option>
+                    <option value="filename">Filename</option>
+                    <option value="domain">Domain</option>
+                    <option value="url">URL</option>
+                    <option value="ip_src">Source IP</option>
+                    <option value="ip_dst">Destination IP</option>
+                </select>
+            </div>
+
+            <div class="converter-input">
+                <h3>2. Enter Value</h3>
+                <textarea 
+                    id="ioc-value-input" 
+                    class="form-control" 
+                    placeholder="Enter IOC value here..."
+                    rows="4"
+                ></textarea>
+            </div>
+
+            <div class="converter-input">
+                <h3>3. Select Rule Type</h3>
+                <div class="checkbox-group">
+                    <label><input type="checkbox" id="convert-yara" checked> YARA Rule</label>
+                    <label><input type="checkbox" id="convert-sigma"> Sigma Rule</label>
+                </div>
+            </div>
+
+            <div class="converter-actions">
+                <button class="btn btn-primary" id="convert-ioc-btn">
+                    <i class="fas fa-wand-magic-wand"></i> Convert IOC
+                </button>
+                <button class="btn btn-secondary" id="clear-converter-btn">
+                    <i class="fas fa-redo"></i> Clear
+                </button>
+            </div>
+
+            <div id="conversion-result" class="conversion-result" style="display: none;">
+                <div class="result-header">Generated Rule:</div>
+                <pre id="conversion-output"></pre>
+                <div class="result-actions">
+                    <button class="btn btn-sm btn-info" id="copy-rule-btn">
+                        <i class="fas fa-copy"></i> Copy
+                    </button>
+                    <button class="btn btn-sm btn-success" id="save-rule-btn">
+                        <i class="fas fa-save"></i> Save Rule
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Rule Editor Section -->
+    <section class="detection-section">
+        <div class="section-header">
+            <h2><i class="fas fa-edit"></i> Rule Editor</h2>
+        </div>
+
+        <div class="rule-editor-container">
+            <div class="editor-sidebar">
+                <h3>Templates</h3>
+                <div class="template-list">
+                    <button class="template-btn" data-template="hash">
+                        <i class="fas fa-fingerprint"></i> File Hash
+                    </button>
+                    <button class="template-btn" data-template="domain">
+                        <i class="fas fa-globe"></i> Domain/URL
+                    </button>
+                    <button class="template-btn" data-template="process">
+                        <i class="fas fa-cog"></i> Process
+                    </button>
+                    <button class="template-btn" data-template="network">
+                        <i class="fas fa-network-wired"></i> Network
+                    </button>
+                </div>
+            </div>
+
+            <div class="editor-main">
+                <div class="editor-controls">
+                    <input 
+                        type="text" 
+                        id="rule-name-input" 
+                        class="form-control" 
+                        placeholder="Rule name..."
+                    >
+                    <select id="rule-category-select" class="form-control">
+                        <option value="custom">Custom</option>
+                        <option value="malware">Malware</option>
+                        <option value="apt">APT</option>
+                        <option value="fileless">Fileless</option>
+                    </select>
+                </div>
+
+                <textarea 
+                    id="rule-editor" 
+                    class="rule-editor-textarea" 
+                    placeholder="Enter YARA/Sigma rule here..."
+                ></textarea>
+
+                <div class="editor-actions">
+                    <button class="btn btn-success" id="validate-rule-btn">
+                        <i class="fas fa-check-circle"></i> Validate
+                    </button>
+                    <button class="btn btn-primary" id="save-editor-rule-btn">
+                        <i class="fas fa-save"></i> Save Rule
+                    </button>
+                    <button class="btn btn-info" id="test-rule-btn" disabled>
+                        <i class="fas fa-flask"></i> Test Rule
+                    </button>
+                    <button class="btn btn-danger" id="clear-editor-btn">
+                        <i class="fas fa-trash"></i> Clear
+                    </button>
+                </div>
+
+                <div id="validation-result" class="validation-result" style="display: none;"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Rule Library Section -->
+    <section class="detection-section">
+        <div class="section-header">
+            <h2><i class="fas fa-book"></i> Rule Library</h2>
+            <div class="section-controls">
+                <input 
+                    type="text" 
+                    id="rules-search" 
+                    class="search-input" 
+                    placeholder="Search rules..."
+                >
+                <button class="btn btn-sm" id="refresh-rules-btn">
+                    <i class="fas fa-sync-alt"></i> Refresh
+                </button>
+            </div>
+        </div>
+
+        <div class="rules-filter">
+            <button class="filter-btn active" data-filter="all">All</button>
+            <button class="filter-btn" data-filter="yara">YARA</button>
+            <button class="filter-btn" data-filter="sigma">Sigma</button>
+            <button class="filter-btn" data-filter="custom">Custom</button>
+            <button class="filter-btn" data-filter="active">Active</button>
+        </div>
+
+        <div class="rules-table-container">
+            <table class="rules-table">
+                <thead>
+                    <tr>
+                        <th>Rule Name</th>
+                        <th>Type</th>
+                        <th>Category</th>
+                        <th>Status</th>
+                        <th>Created</th>
+                        <th>Hits</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="rules-table-body">
+                    <tr>
+                        <td colspan="7" class="text-center">
+                            <i class="fas fa-spin fa-spinner"></i> Loading rules...
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- Deployment Section -->
+    <section class="detection-section">
+        <div class="section-header">
+            <h2><i class="fas fa-rocket"></i> Rule Deployment</h2>
+        </div>
+
+        <div class="deployment-container">
+            <div class="deployment-targets">
+                <h3>Deploy To:</h3>
+                <div class="checkbox-group">
+                    <label><input type="checkbox" id="deploy-velociraptor" checked> Velociraptor</label>
+                    <label><input type="checkbox" id="deploy-wazuh" checked> Wazuh</label>
+                </div>
+            </div>
+
+            <div class="deployment-options">
+                <h3>Options:</h3>
+                <label><input type="checkbox" id="require-validation" checked> Require Validation</label>
+                <label><input type="checkbox" id="auto-test"> Auto-Test Rules</label>
+                <label><input type="checkbox" id="enable-rollback" checked> Enable Rollback</label>
+            </div>
+
+            <div class="deployment-actions">
+                <button class="btn btn-primary btn-lg" id="deploy-rules-btn">
+                    <i class="fas fa-cloud-upload-alt"></i> Deploy Selected Rules
+                </button>
+            </div>
+
+            <div id="deployment-status" class="deployment-status" style="display: none;"></div>
+        </div>
+    </section>
+
+    <!-- Performance Metrics Section -->
+    <section class="detection-section">
+        <div class="section-header">
+            <h2><i class="fas fa-chart-line"></i> Performance Metrics</h2>
+        </div>
+
+        <div class="metrics-container">
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <h4>Detection Rate</h4>
+                    <div class="metric-value" id="metric-detection-rate">--</div>
+                    <small>Rules with hits</small>
+                </div>
+
+                <div class="metric-card">
+                    <h4>False Positive Rate</h4>
+                    <div class="metric-value" id="metric-fp-rate">--</div>
+                    <small>Avg accuracy</small>
+                </div>
+
+                <div class="metric-card">
+                    <h4>Avg Execution Time</h4>
+                    <div class="metric-value" id="metric-exec-time">--</div>
+                    <small>Per scan</small>
+                </div>
+
+                <div class="metric-card">
+                    <h4>Rule Coverage</h4>
+                    <div class="metric-value" id="metric-coverage">--</div>
+                    <small>Techniques covered</small>
+                </div>
+            </div>
+
+            <div class="top-rules">
+                <h4>Top Performing Rules</h4>
+                <table class="metrics-table">
+                    <thead>
+                        <tr>
+                            <th>Rule</th>
+                            <th>Hits</th>
+                            <th>False Positives</th>
+                            <th>Effectiveness</th>
+                        </tr>
+                    </thead>
+                    <tbody id="top-rules-body">
+                        <tr><td colspan="4">Loading data...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- Rule Detail Modal -->
+    <div id="rule-detail-modal" class="modal hidden">
+        <div class="modal-content modal-lg">
+            <div class="modal-header">
+                <h2>Rule Details: <span id="modal-rule-name"></span></h2>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="rule-detail-section">
+                    <h4>Rule Content</h4>
+                    <pre id="rule-detail-content"></pre>
+                </div>
+                <div class="rule-detail-section">
+                    <h4>Statistics</h4>
+                    <div id="rule-detail-stats"></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-info" id="edit-rule-modal-btn">Edit</button>
+                <button class="btn btn-danger" id="delete-rule-modal-btn">Delete</button>
+                <button class="btn btn-secondary" id="close-rule-modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>

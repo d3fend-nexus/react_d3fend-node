@@ -1,0 +1,340 @@
+<!-- Network Analysis Tab Content -->
+<div id="network-content" class="tab-content hidden">
+    <!-- Network Statistics Section -->
+    <section class="network-section">
+        <div class="section-header">
+            <h2><i class="fas fa-network-wired"></i> Network Overview</h2>
+        </div>
+
+        <div class="network-stats-grid">
+            <div class="network-stat-card">
+                <div class="stat-header">
+                    <i class="fas fa-ethernet"></i>
+                    <h3>Active Interfaces</h3>
+                </div>
+                <div class="stat-value" id="stat-interfaces">0</div>
+                <div class="stat-breakdown">
+                    <small>Monitoring: <span id="stat-monitoring">0</span></small>
+                </div>
+            </div>
+
+            <div class="network-stat-card">
+                <div class="stat-header">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <h3>Alerts Today</h3>
+                </div>
+                <div class="stat-value" id="stat-alerts-today">0</div>
+                <div class="stat-breakdown">
+                    <small>Critical: <span id="stat-critical-alerts">0</span></small>
+                </div>
+            </div>
+
+            <div class="network-stat-card">
+                <div class="stat-header">
+                    <i class="fas fa-globe"></i>
+                    <h3>Unique IPs</h3>
+                </div>
+                <div class="stat-value" id="stat-unique-ips">0</div>
+                <div class="stat-breakdown">
+                    <small>Last 24h: <span id="stat-ips-24h">0</span></small>
+                </div>
+            </div>
+
+            <div class="network-stat-card">
+                <div class="stat-header">
+                    <i class="fas fa-chart-bar"></i>
+                    <h3>Traffic Volume</h3>
+                </div>
+                <div class="stat-value" id="stat-traffic-volume">0 GB</div>
+                <div class="stat-breakdown">
+                    <small>Peak: <span id="stat-peak-traffic">0 Mbps</span></small>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Network Interfaces Section -->
+    <section class="network-section">
+        <div class="section-header">
+            <h2><i class="fas fa-network-wired"></i> Network Interfaces</h2>
+        </div>
+
+        <div class="interfaces-container">
+            <div class="interface-cards" id="interfaces-list">
+                <!-- Interface cards will be populated here -->
+            </div>
+
+            <div class="add-interface">
+                <button class="btn btn-primary" id="add-interface-btn">
+                    <i class="fas fa-plus"></i> Add Interface
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Real-time Alerts Section -->
+    <section class="network-section">
+        <div class="section-header">
+            <h2><i class="fas fa-bell"></i> Real-time Alerts</h2>
+            <div class="section-controls">
+                <button class="btn btn-sm" id="clear-alerts-btn">
+                    <i class="fas fa-trash"></i> Clear
+                </button>
+                <button class="btn btn-sm" id="pause-alerts-btn">
+                    <i class="fas fa-pause"></i> Pause
+                </button>
+            </div>
+        </div>
+
+        <div class="alerts-filter">
+            <button class="filter-btn active" data-severity="all">All</button>
+            <button class="filter-btn" data-severity="critical">Critical</button>
+            <button class="filter-btn" data-severity="high">High</button>
+            <button class="filter-btn" data-severity="medium">Medium</button>
+            <button class="filter-btn" data-severity="low">Low</button>
+        </div>
+
+        <div class="alerts-table-container">
+            <table class="alerts-table">
+                <thead>
+                    <tr>
+                        <th>Time</th>
+                        <th>Severity</th>
+                        <th>Source IP</th>
+                        <th>Dest IP</th>
+                        <th>Protocol</th>
+                        <th>Alert</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="alerts-table-body">
+                    <tr>
+                        <td colspan="7" class="text-center">
+                            <i class="fas fa-spin fa-spinner"></i> Waiting for alerts...
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- Network Flows Section -->
+    <section class="network-section">
+        <div class="section-header">
+            <h2><i class="fas fa-arrows-alt-h"></i> Network Flows</h2>
+            <div class="section-controls">
+                <input 
+                    type="text" 
+                    id="flows-search" 
+                    class="search-input" 
+                    placeholder="Search flows..."
+                >
+                <select id="flows-protocol-filter" class="form-control">
+                    <option value="">All Protocols</option>
+                    <option value="tcp">TCP</option>
+                    <option value="udp">UDP</option>
+                    <option value="icmp">ICMP</option>
+                    <option value="other">Other</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="flows-table-container">
+            <table class="flows-table">
+                <thead>
+                    <tr>
+                        <th>Source IP</th>
+                        <th>Dest IP</th>
+                        <th>Port</th>
+                        <th>Protocol</th>
+                        <th>Packets</th>
+                        <th>Bytes</th>
+                        <th>Duration</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="flows-table-body">
+                    <tr>
+                        <td colspan="8" class="text-center">
+                            <i class="fas fa-spin fa-spinner"></i> Loading flows...
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- Protocol Analysis Section -->
+    <section class="network-section">
+        <div class="section-header">
+            <h2><i class="fas fa-microscope"></i> Protocol Analysis</h2>
+        </div>
+
+        <div class="protocol-tabs">
+            <button class="protocol-tab active" data-protocol="dns">
+                <i class="fas fa-globe"></i> DNS
+            </button>
+            <button class="protocol-tab" data-protocol="http">
+                <i class="fas fa-globe"></i> HTTP
+            </button>
+            <button class="protocol-tab" data-protocol="tls">
+                <i class="fas fa-lock"></i> TLS
+            </button>
+            <button class="protocol-tab" data-protocol="ssh">
+                <i class="fas fa-terminal"></i> SSH
+            </button>
+            <button class="protocol-tab" data-protocol="smtp">
+                <i class="fas fa-envelope"></i> SMTP
+            </button>
+        </div>
+
+        <div class="protocol-content">
+            <div id="dns-analysis" class="protocol-panel active">
+                <h3>DNS Queries</h3>
+                <div class="protocol-stats">
+                    <div class="stat-item">
+                        <span>Total Queries:</span>
+                        <strong id="dns-total-queries">0</strong>
+                    </div>
+                    <div class="stat-item">
+                        <span>Unique Domains:</span>
+                        <strong id="dns-unique-domains">0</strong>
+                    </div>
+                    <div class="stat-item">
+                        <span>Failed Queries:</span>
+                        <strong id="dns-failed-queries">0</strong>
+                    </div>
+                </div>
+                <div class="protocol-table-container">
+                    <table class="protocol-table">
+                        <thead>
+                            <tr>
+                                <th>Timestamp</th>
+                                <th>Domain</th>
+                                <th>Query Type</th>
+                                <th>Response</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="dns-table-body">
+                            <tr><td colspan="5">Loading DNS data...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="http-analysis" class="protocol-panel">
+                <h3>HTTP Requests</h3>
+                <div class="protocol-stats">
+                    <div class="stat-item">
+                        <span>Total Requests:</span>
+                        <strong id="http-total-requests">0</strong>
+                    </div>
+                    <div class="stat-item">
+                        <span>Unique Hosts:</span>
+                        <strong id="http-unique-hosts">0</strong>
+                    </div>
+                    <div class="stat-item">
+                        <span>Suspicious URLs:</span>
+                        <strong id="http-suspicious">0</strong>
+                    </div>
+                </div>
+                <div class="protocol-table-container">
+                    <table class="protocol-table">
+                        <thead>
+                            <tr>
+                                <th>Timestamp</th>
+                                <th>Method</th>
+                                <th>Host</th>
+                                <th>URI</th>
+                                <th>Status Code</th>
+                            </tr>
+                        </thead>
+                        <tbody id="http-table-body">
+                            <tr><td colspan="5">Loading HTTP data...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="tls-analysis" class="protocol-panel">
+                <h3>TLS Certificates</h3>
+                <div class="protocol-stats">
+                    <div class="stat-item">
+                        <span>Total Connections:</span>
+                        <strong id="tls-total-connections">0</strong>
+                    </div>
+                    <div class="stat-item">
+                        <span>Self-Signed Certs:</span>
+                        <strong id="tls-self-signed">0</strong>
+                    </div>
+                    <div class="stat-item">
+                        <span>Expired Certs:</span>
+                        <strong id="tls-expired">0</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- PCAP Management Section -->
+    <section class="network-section">
+        <div class="section-header">
+            <h2><i class="fas fa-file-download"></i> PCAP Management</h2>
+        </div>
+
+        <div class="pcap-controls">
+            <button class="btn btn-primary" id="start-capture-btn">
+                <i class="fas fa-play"></i> Start Capture
+            </button>
+            <button class="btn btn-danger" id="stop-capture-btn" disabled>
+                <i class="fas fa-stop"></i> Stop Capture
+            </button>
+            <button class="btn btn-secondary" id="export-pcap-btn">
+                <i class="fas fa-download"></i> Export PCAP
+            </button>
+        </div>
+
+        <div class="pcap-list">
+            <h3>Recent Captures</h3>
+            <div class="pcap-table-container">
+                <table class="pcap-table">
+                    <thead>
+                        <tr>
+                            <th>File Name</th>
+                            <th>Size</th>
+                            <th>Created</th>
+                            <th>Packets</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="pcap-table-body">
+                        <tr>
+                            <td colspan="5" class="text-center">
+                                <i class="fas fa-spin fa-spinner"></i> Loading captures...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- Alert Detail Modal -->
+    <div id="alert-detail-modal" class="modal hidden">
+        <div class="modal-content modal-lg">
+            <div class="modal-header">
+                <h2>Alert Details</h2>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body" id="alert-detail-body">
+                <!-- Alert details populated here -->
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-info" id="block-ip-btn">Block IP</button>
+                <button class="btn btn-warning" id="investigate-btn">Investigate</button>
+                <button class="btn btn-secondary" id="close-alert-modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>

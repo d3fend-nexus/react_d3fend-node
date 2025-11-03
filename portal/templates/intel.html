@@ -1,0 +1,146 @@
+<!-- Threat Intelligence Tab Content -->
+<div id="intel-content" class="tab-content hidden">
+    <!-- Intel Search Section -->
+    <section class="intel-section">
+        <div class="section-header">
+            <h2><i class="fas fa-shield-virus"></i> Threat Intelligence Search</h2>
+        </div>
+
+        <div class="intel-search-container">
+            <div class="search-box">
+                <input 
+                    type="text" 
+                    id="intel-search-input" 
+                    class="search-input" 
+                    placeholder="Search IOC: IP, domain, hash, URL, email..."
+                    autocomplete="off"
+                >
+                <button id="intel-search-btn" class="btn btn-primary">
+                    <i class="fas fa-search"></i> Search
+                </button>
+            </div>
+
+            <div class="search-filters">
+                <label>IOC Type:</label>
+                <select id="ioc-type-select" class="filter-select">
+                    <option value="auto">Auto Detect</option>
+                    <option value="ipv4">IPv4 Address</option>
+                    <option value="ipv6">IPv6 Address</option>
+                    <option value="domain">Domain</option>
+                    <option value="hostname">Hostname</option>
+                    <option value="url">URL</option>
+                    <option value="email">Email</option>
+                    <option value="md5">MD5 Hash</option>
+                    <option value="sha1">SHA1 Hash</option>
+                    <option value="sha256">SHA256 Hash</option>
+                </select>
+            </div>
+        </div>
+    </section>
+
+    <!-- Search Results Section -->
+    <section class="intel-section" id="search-results-section" style="display: none;">
+        <div class="section-header">
+            <h2><i class="fas fa-list"></i> Search Results</h2>
+            <div class="section-controls">
+                <button class="btn btn-sm" id="export-results-btn">
+                    <i class="fas fa-download"></i> Export
+                </button>
+            </div>
+        </div>
+
+        <div id="search-results" class="search-results">
+            <!-- Results populated by JavaScript -->
+        </div>
+    </section>
+
+    <!-- MISP Statistics Section -->
+    <section class="intel-section">
+        <div class="section-header">
+            <h2><i class="fas fa-chart-bar"></i> MISP Statistics</h2>
+            <div class="section-controls">
+                <button class="btn btn-sm" id="refresh-intel-btn">
+                    <i class="fas fa-sync-alt"></i> Refresh
+                </button>
+            </div>
+        </div>
+
+        <div class="intel-stats-grid">
+            <div class="intel-stat-card">
+                <h3>Total Events</h3>
+                <div class="stat-value" id="stat-events">--</div>
+            </div>
+            <div class="intel-stat-card">
+                <h3>Total Attributes</h3>
+                <div class="stat-value" id="stat-attributes">--</div>
+            </div>
+            <div class="intel-stat-card">
+                <h3>Active Feeds</h3>
+                <div class="stat-value" id="stat-feeds">--</div>
+            </div>
+            <div class="intel-stat-card">
+                <h3>Last Sync</h3>
+                <div class="stat-value" id="stat-last-sync">--</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Threat Feeds Section -->
+    <section class="intel-section">
+        <div class="section-header">
+            <h2><i class="fas fa-network-wired"></i> Threat Feeds</h2>
+            <div class="section-controls">
+                <button class="btn btn-sm btn-success" id="sync-feeds-btn">
+                    <i class="fas fa-download"></i> Sync All Feeds
+                </button>
+            </div>
+        </div>
+
+        <div class="feeds-table-container">
+            <table class="feeds-table">
+                <thead>
+                    <tr>
+                        <th>Feed Name</th>
+                        <th>Status</th>
+                        <th>IOCs</th>
+                        <th>Last Updated</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="feeds-table-body">
+                    <!-- Populated by JavaScript -->
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- Recent Events Section -->
+    <section class="intel-section">
+        <div class="section-header">
+            <h2><i class="fas fa-fire"></i> Recent Threat Events</h2>
+        </div>
+
+        <div class="events-timeline" id="events-timeline">
+            <!-- Events populated by JavaScript -->
+        </div>
+    </section>
+
+    <!-- IOC Details Modal -->
+    <div id="ioc-modal" class="modal hidden">
+        <div class="modal-content modal-lg">
+            <div class="modal-header">
+                <h2>IOC Details</h2>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body" id="ioc-modal-body">
+                <!-- IOC details populated by JavaScript -->
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="close-ioc-modal">Close</button>
+                <button class="btn btn-primary" id="copy-ioc-btn">
+                    <i class="fas fa-copy"></i> Copy IOC
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

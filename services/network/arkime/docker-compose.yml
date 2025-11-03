@@ -1,0 +1,83 @@
+version: '3.8'
+
+services:
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.14.0
+    container_name: arkime-elasticsearch
+    environment:
+      - discovery.type=single-node
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - xpack.security.enabled=false
+    volumes:
+      - arkime-es-data:/usr/share/elasticsearch/data
+    ports:
+      - "9200:9200"
+    networks:
+      - arkime-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9200"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+
+  arkime:
+    image: arkime/arkime-full:latest
+    container_name: arkime-capture
+    depends_on:
+      - elasticsearch
+    environment:
+      - ARKIME_CAPTURE_INTERFACE=eth0
+      - ARKIME_ELASTICSEARCH=elasticsearch:9200
+      - ARKIME_CAPTURE_SNAPLEN=65535
+      - ARKIME_CAPTURE_BUFFER=32768
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+      - SYS_NICE
+    network_mode: host
+    volumes:
+      - arkime-pcap:/data/pcap
+      - arkime-indices:/data/indices
+      - ./arkime.ini:/opt/arkime/etc/config.ini:ro
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8005"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  arkime-viewer:
+    image: arkime/arkime-full:latest
+    container_name: arkime-viewer
+    depends_on:
+      - elasticsearch
+    environment:
+      - ARKIME_ELASTICSEARCH=elasticsearch:9200
+    ports:
+      - "8005:8005"
+    volumes:
+      - arkime-pcap:/data/pcap:ro
+      - arkime-indices:/data/indices:ro
+      - ./arkime.ini:/opt/arkime/etc/config.ini:ro
+    networks:
+      - arkime-network
+    restart: unless-stopped
+    command: /opt/arkime/bin/viewer -c /opt/arkime/etc/config.ini
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8005"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+volumes:
+  arkime-es-data:
+    driver: local
+  arkime-pcap:
+    driver: local
+  arkime-indices:
+    driver: local
+
+networks:
+  arkime-network:
+    driver: bridge

@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  suricata:
+    image: jasonish/suricata:latest
+    container_name: suricata-ids
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+      - SYS_NICE
+    network_mode: host
+    environment:
+      - SURICATA_INTERFACE=eth0
+      - SURICATA_LOG_DIR=/var/log/suricata
+      - SURICATA_RULE_DIR=/etc/suricata/rules
+    volumes:
+      - suricata-rules:/etc/suricata/rules
+      - suricata-logs:/var/log/suricata
+      - ./suricata.yaml:/etc/suricata/suricata.yaml:ro
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "test", "-f", "/var/log/suricata/eve.json"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    command: >
+      bash -c "
+      mkdir -p /var/log/suricata /etc/suricata/rules;
+      /usr/bin/suricata -c /etc/suricata/suricata.yaml -i eth0
+      "
+
+volumes:
+  suricata-rules:
+    driver: local
+  suricata-logs:
+    driver: local
+
+networks:
+  default:
+    driver: bridge
